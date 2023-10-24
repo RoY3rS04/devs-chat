@@ -17,6 +17,14 @@ const UserSchema = mongoose.Schema({
         required: true,
         type: String
     },
+    img: {
+        type: String,
+        default: 'https://ik.imagekit.io/4ztt7kzzm/default_user_image.png?updatedAt=1698091515542'
+    },
+    state: {
+        type: Boolean,
+        default: true
+    },
     messages: [
         {
             type: mongoose.Schema.Types.ObjectId,

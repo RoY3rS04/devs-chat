@@ -72,14 +72,58 @@ const loginUser = async (req, res) => {
     });
 }
 
-const googleSuccess = (req, res) => {
+const googleSuccess = async (req, res) => {
+
+    const { name, email, picture: img } = req.user._json;
+
+    try {
+        
+        let user = await User.findOne({ email });
+
+        if (!user) {
+            user = new User({
+                name,
+                email,
+                img,
+                password: ':P'
+            })
+
+            await user.save();
+        }
+
+        if (!user.state) {
+            return res.json({
+                msg: 'Your account was deleted'
+            })
+        }
+
+        res.json({
+            ok: true,
+            token: generateJWT(user.id),
+            session: req.session
+        });
+
+    } catch (error) {
+        console.log(error);
+
+        res.status(400).json({
+            msg: 'Something went wrong'
+        })
+    }
+}
+
+const logOut = (req, res) => {
+    req.session.destroy();
+
     res.json({
-        user: req.user._json
+        ok: true,
+        msg: 'Session destroyed correctly'
     })
 }
 
 export {
     registerUser,
     loginUser,
-    googleSuccess
+    googleSuccess,
+    logOut
 }
