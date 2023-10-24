@@ -7,6 +7,9 @@ import userRoutes from './routes/userRoutes.js';
 import connectDB from './database/config.js';
 import session from 'express-session';
 import fileUpload from 'express-fileupload';
+import messageRoutes from './routes/messageRoutes.js';
+import chatRoutes from './routes/chatRoutes.js';
+import groupRoutes from './routes/groupRoutes.js';
 
 dotenv.config();
 
@@ -62,6 +65,12 @@ passport.deserializeUser((user, done) => {
 app.use('/auth', authRoutes);
 
 app.use('/users', userRoutes);
+
+app.use('/messages', messageRoutes);
+
+app.use('/chats', chatRoutes);
+
+app.use('/groups', groupRoutes);
 
 app.listen(process.env.PORT, () => {
     console.log('listening on port', process.env.PORT)
