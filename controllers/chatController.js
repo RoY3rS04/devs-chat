@@ -88,18 +88,7 @@ const deleteChat = async (req, res) => {
     const { id } = req.params;
 
     try {
-        const chat = await Chat.findById(id);
-
-        if (!chat) {
-            return res.json({
-                ok: false,
-                msg: 'There is no chat with that id'
-            })
-        }
-
-        chat.state = false;
-
-        await chat.save();
+        const chat = await Chat.findByIdAndUpdate(id, {state: false}, {new: true});
 
         res.json({
             ok: true,

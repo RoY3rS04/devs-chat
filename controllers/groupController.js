@@ -1,4 +1,5 @@
 import Group from "../models/Group.js";
+import User from "../models/User.js";
 
 const getGroups = async (req, res) => {
 
@@ -75,8 +76,78 @@ const deleteGroup = async (req, res) => {
 
 }
 
+const joinToGroup = async (req, res) => {
+    
+    const { _id } = req.user;
+    const { id : groupId } = req.params;
+
+    try {
+
+        const group = await Group.findById(groupId);
+
+        if (group.users.includes(_id)) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'You are already on that group'
+            })
+        }
+
+        group.users.push(_id);
+
+        await group.save();
+
+        res.json({
+            ok: true,
+            group
+        })
+
+    } catch (error) {
+        res.json({
+            ok: false,
+            msg: 'Something went wrong'
+        })
+    }
+
+}
+
+const leaveGroup = async (req, res) => {
+
+    const { _id } = req.user;
+    const { id : groupId } = req.params;
+
+    try {
+
+        const group = await Group.findById(groupId);
+
+        if (!group.users.includes(_id)) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'You are not a member of the group can\'t do this action'
+            })
+        }
+
+        group.users = group.users.filter(user => String(user) !== String(_id));
+
+        await group.save();
+
+        res.json({
+            ok: true,
+            group
+        })
+
+    } catch (error) {
+        res.json({
+            ok: false,
+            msg: 'Something went wrong'
+        })
+    }
+
+}
+
 export {
     getGroups,
     createGroup,
-    deleteGroup
+    deleteGroup,
+    joinToGroup,
+    leaveGroup
 }

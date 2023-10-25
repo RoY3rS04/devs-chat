@@ -3,6 +3,7 @@ import { createChat, deleteChat, getChats } from "../controllers/chatController.
 import validateJWT from '../middlewares/validateJWT.js';
 import { check } from "express-validator";
 import validateFields from "../middlewares/validateFields.js";
+import { chatExists } from "../helpers/dbValidators.js";
 
 const router = Router();
 
@@ -19,6 +20,7 @@ router.post('/create', [
 router.delete('/delete/:id', [
     validateJWT,
     check('id', 'The provided id is not valid').isMongoId(),
+    check('id').custom(chatExists),
     validateFields
 ], deleteChat);
 

@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { createGroup, deleteGroup, getGroups } from "../controllers/groupController.js";
+import { createGroup, deleteGroup, getGroups, joinToGroup, leaveGroup } from "../controllers/groupController.js";
 import validateJWT from "../middlewares/validateJWT.js";
 import { check } from "express-validator";
 import validateFields from "../middlewares/validateFields.js";
+import { groupExists } from "../helpers/dbValidators.js";
 
 const router = Router();
 
@@ -19,7 +20,22 @@ router.post('/', [
 router.delete('/:id', [
     validateJWT,
     check('id', 'Id is invalid').isMongoId(),
+    check('id').custom(groupExists),
     validateFields
-], deleteGroup)
+], deleteGroup);
+
+router.put('/:id/users', [
+    validateJWT,
+    check('id', 'Group id is invalid').isMongoId(),
+    check('id').custom(groupExists),
+    validateFields
+], joinToGroup);
+
+router.delete('/:id/users', [
+    validateJWT,
+    check('id', 'Group id is invalid').isMongoId(),
+    check('id').custom(groupExists),
+    validateFields
+], leaveGroup);
 
 export default router;
