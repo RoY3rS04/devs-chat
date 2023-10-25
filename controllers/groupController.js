@@ -1,5 +1,7 @@
+import imageKit from "../helpers/imageKit.js";
 import Group from "../models/Group.js";
 import User from "../models/User.js";
+import fs from 'node:fs/promises';
 
 const getGroups = async (req, res) => {
 
@@ -7,7 +9,8 @@ const getGroups = async (req, res) => {
 
     try {
         const groups = await Group.find({
-            'users': _id
+            'users': _id,
+            state: true
         }).distinct('_id');
 
         res.json({
@@ -144,10 +147,65 @@ const leaveGroup = async (req, res) => {
 
 }
 
+const updateGroup = async (req, res) => {
+
+    const { name } = req.body;
+    const { id } = req.params;
+
+    let tempFilePath;
+
+    if (req.files) {
+        tempFilePath = req.files.image.tempFilePath;
+    }
+
+    let imageUrl;
+
+    if (!name && !tempFilePath) {
+        return res.status(400).json({
+            ok: false,
+            msg: 'Nothing to update'
+        })
+    }
+
+    if (tempFilePath) {
+        const file = await fs.readFile(tempFilePath);
+
+        const { url, fileId } = await imageKit().upload({
+            file,
+            fileName: 'group_image'
+        })
+
+        imageUrl = `${url}*${fileId}`;
+    }
+
+    try {
+        const group = await Group.findByIdAndUpdate(id, { name, img: imageUrl });
+        
+        if (group.img && imageUrl) {
+            const [, id] = group.img.split('*');
+
+            await imageKit().deleteFile(id);
+        }
+
+        res.json({
+            ok: true,
+            group
+        })
+    } catch (error) {
+        console.log(error);
+        res.json({
+            ok: false,
+            msg: 'Something went wrong'
+        })
+    }
+
+}
+
 export {
     getGroups,
     createGroup,
     deleteGroup,
     joinToGroup,
-    leaveGroup
+    leaveGroup,
+    updateGroup
 }

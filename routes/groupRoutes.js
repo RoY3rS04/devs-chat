@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createGroup, deleteGroup, getGroups, joinToGroup, leaveGroup } from "../controllers/groupController.js";
+import { createGroup, deleteGroup, getGroups, joinToGroup, leaveGroup, updateGroup } from "../controllers/groupController.js";
 import validateJWT from "../middlewares/validateJWT.js";
 import { check } from "express-validator";
 import validateFields from "../middlewares/validateFields.js";
@@ -37,5 +37,12 @@ router.delete('/:id/users', [
     check('id').custom(groupExists),
     validateFields
 ], leaveGroup);
+
+router.put('/:id', [
+    validateJWT,
+    check('id', 'Group id is invalid').isMongoId(),
+    check('id').custom(groupExists),
+    validateFields
+], updateGroup)
 
 export default router;

@@ -42,7 +42,7 @@ const getChatMessages = async (req, res) => {
 
         res.json({
             ok: true,
-            messages: chat.messages
+            messages: chat.messages.filter(message => message.state)
         })
     } catch (error) {
         res.json({
@@ -75,7 +75,7 @@ const getGroupMessages = async (req, res) => {
 
         res.json({
             ok: true,
-            messages: group.messages
+            messages: group.messages.filter(message => message.state)
         })
     } catch (error) {
         res.json({
@@ -154,10 +154,77 @@ const createGroupMessage = async (req, res) => {
 
 }
 
+const deleteMessage = async (req, res) => {
+
+    const { _id } = req.user;
+    const { id: messageId } = req.params;
+
+    try {
+        const message = await Message.findById(messageId);
+
+        if (String(message.user) !== String(_id)) {
+            return res.json({
+                ok: false,
+                msg: 'You cannot remove other users messages'
+            })
+        }
+
+        message.state = false;
+
+        await message.save();
+
+        res.json({
+            ok: true,
+            message
+        })
+    } catch (error) {
+        res.json({
+            ok: false,
+            msg: 'Something went wrong'
+        })
+    }
+
+}
+
+const updateMessage = async (req, res) => {
+
+    const { _id } = req.user;
+    const { id: messageId } = req.params;
+    const { content } = req.body;
+
+    try {
+        const message = await Message.findById(messageId);
+
+        if (String(message.user) !== String(_id)) {
+            return res.json({
+                ok: false,
+                msg: 'You cannot edit other users messages'
+            })
+        }
+
+        message.content = content;
+
+        await message.save();
+
+        res.json({
+            ok: true,
+            message
+        })
+    } catch (error) {
+        res.json({
+            ok: false,
+            msg: 'Something went wrong'
+        })
+    }
+
+}
+
 export {
     getMessages,
     getChatMessages,
     getGroupMessages,
     createChatMessage,
-    createGroupMessage
+    createGroupMessage,
+    deleteMessage,
+    updateMessage
 }

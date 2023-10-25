@@ -14,7 +14,8 @@ const getChats = async (req, res) => {
                 {
                     'receiver': _id
                 }
-            ]
+            ],
+            state: true
         }).distinct('_id');
 
         if (!chats) {

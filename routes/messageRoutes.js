@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { createChatMessage, createGroupMessage, getChatMessages, getGroupMessages, getMessages } from "../controllers/messageController.js";
+import { createChatMessage, createGroupMessage, deleteMessage, getChatMessages, getGroupMessages, getMessages, updateMessage } from "../controllers/messageController.js";
 import validateJWT from "../middlewares/validateJWT.js";
 import { check } from "express-validator";
 import validateFields from "../middlewares/validateFields.js";
-import { chatExists, groupExists } from "../helpers/dbValidators.js";
+import { chatExists, groupExists, messageExists } from "../helpers/dbValidators.js";
 
 const router = Router();
 
@@ -38,5 +38,20 @@ router.post('/group/:id', [
     check('content', 'The message field must be filled').not().isEmpty(),
     validateFields
 ], createGroupMessage);
+
+router.delete('/:id', [
+    validateJWT,
+    check('id', 'Invalid id').isMongoId(),
+    check('id').custom(messageExists),
+    validateFields
+], deleteMessage)
+
+router.patch('/:id', [
+    validateJWT,
+    check('id', 'Invalid id').isMongoId(),
+    check('id').custom(messageExists),
+    check('content', 'You must fill the message field').not().isEmpty(),
+    validateFields
+], updateMessage)
 
 export default router;

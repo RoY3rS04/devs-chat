@@ -53,10 +53,21 @@ const getUser = async (req, res) => {
 const updateUser = async (req, res) => {
 
     const { name, password } = req.body;
-    const { tempFilePath } = req.files.image;
-    const { id } = req.params;
+    const { _id } = req.user;
 
     let image;
+    let tempFilePath;
+
+    if (req.files) {
+        tempFilePath = req.files.image.tempFilePath;
+    }
+
+    if (!name && !tempFilePath && !password) {
+        return res.status(400).json({
+            ok: false,
+            msg: 'Nothing to update'
+        })
+    }
 
     if (tempFilePath) {
         const file = await fs.readFile(tempFilePath);
@@ -71,7 +82,7 @@ const updateUser = async (req, res) => {
 
     try {
 
-        const user = await User.findById(id);
+        const user = await User.findById(_id);
         const salt = await bcrypt.genSalt(10);
 
         if (user.img.split('*').length > 1 && image) {
@@ -105,10 +116,10 @@ const updateUser = async (req, res) => {
 
 const deleteUser = async (req, res) => {
 
-    const { id } = req.params;
+    const { _id } = req.user;
 
     try {
-        const user = await User.findByIdAndUpdate(id, { state: false }, {new: true});
+        const user = await User.findByIdAndUpdate(_id, { state: false }, {new: true});
 
         res.json({
             ok: true,

@@ -21,6 +21,9 @@ const GroupSchema = mongoose.Schema({
     state: {
         type: Boolean,
         default: true
+    },
+    img: {
+        type: String
     }
 })
 
