@@ -10,12 +10,31 @@ import fileUpload from 'express-fileupload';
 import messageRoutes from './routes/messageRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
 import groupRoutes from './routes/groupRoutes.js';
+import cors from 'cors';
 
 dotenv.config();
 
 const app = express();
 
 app.use(express.json());
+
+const permitedDomains = [
+    'http://localhost:5173',
+    'http://localhost:8080'
+];
+
+const corsOptions = {
+    origin: function (origin, cb) {
+        if (permitedDomains.indexOf(origin) !== -1 || !origin) {
+            cb(null, true);
+        } else {
+            cb(new Error('Not allowed by CORS'))
+        }
+    },
+    credentials: true
+}
+
+app.use(cors(corsOptions));
 
 app.use(session({
     saveUninitialized: true,

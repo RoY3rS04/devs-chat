@@ -1,6 +1,6 @@
 import { Router } from "express";
 import passport from 'passport';
-import { googleSuccess, logOut, loginUser, registerUser } from "../controllers/authController.js";
+import { googleSuccess, logOut, loginUser, registerUser, verifySession } from "../controllers/authController.js";
 
 const router = Router();
 
@@ -22,5 +22,7 @@ router.get('/google/success',
 )
 
 router.post('/logout', logOut);
+
+router.get('/session', verifySession);
 
 export default router;

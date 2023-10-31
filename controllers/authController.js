@@ -1,3 +1,4 @@
+import passport from "passport";
 import generateJWT from "../helpers/generateJWT.js";
 import User from "../models/User.js";
 import bcrypt from 'bcrypt';
@@ -47,7 +48,7 @@ const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-        return res.json({
+        return res.status(400).json({
             msg: 'Please fill all the fields'
         })
     }
@@ -67,7 +68,6 @@ const loginUser = async (req, res) => {
     }
 
     res.json({
-        user,
         token: generateJWT(user.id)
     });
 }
@@ -97,11 +97,7 @@ const googleSuccess = async (req, res) => {
             })
         }
 
-        res.json({
-            ok: true,
-            token: generateJWT(user.id),
-            session: req.session
-        });
+        res.redirect('http://localhost:5173/');
 
     } catch (error) {
         console.log(error);
@@ -121,9 +117,28 @@ const logOut = (req, res) => {
     })
 }
 
+const verifySession = (req, res) => {
+
+    const { passport } = req.session;
+
+    if (passport && passport.user) {
+        return res.json({
+            ok: true,
+            msg: 'Session verified correctly'
+        })
+    }
+
+    res.json({
+        ok: false,
+        msg: 'There is no session active'
+    })
+
+}
+
 export {
     registerUser,
     loginUser,
     googleSuccess,
-    logOut
+    logOut,
+    verifySession
 }
