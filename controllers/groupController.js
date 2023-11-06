@@ -1,9 +1,8 @@
 import imageKit from "../helpers/imageKit.js";
 import Group from "../models/Group.js";
-import User from "../models/User.js";
 import fs from 'node:fs/promises';
 
-const getGroups = async (req, res) => {
+const getAuthGroups = async (req, res) => {
 
     const { _id } = req.user;
 
@@ -11,7 +10,7 @@ const getGroups = async (req, res) => {
         const groups = await Group.find({
             'users': _id,
             state: true
-        }).distinct('_id');
+        }, 'name users img');
 
         res.json({
             groups
@@ -24,6 +23,34 @@ const getGroups = async (req, res) => {
         })
     }
 
+}
+
+const   getGroups = async (req, res) => {
+
+    const { from = 0, limit = 10 } = req.query;
+
+    try {
+        const [groups, total] = await Promise.all(
+            [
+                Group.find({
+                    state: true
+                }).skip(Number(from))
+                .limit(Number(limit)),
+                Group.countDocuments({ state: true })
+            ]
+        );
+
+        res.json({
+            ok: true,
+            total,
+            groups
+        })
+    } catch (error) {
+        res.json({
+            ok: false,
+            error
+        })
+    }
 }
 
 const createGroup = async (req, res) => {
@@ -202,10 +229,11 @@ const updateGroup = async (req, res) => {
 }
 
 export {
-    getGroups,
+    getAuthGroups,
     createGroup,
     deleteGroup,
     joinToGroup,
     leaveGroup,
-    updateGroup
+    updateGroup,
+    getGroups
 }

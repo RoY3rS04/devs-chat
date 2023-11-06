@@ -16,7 +16,11 @@ const getChats = async (req, res) => {
                 }
             ],
             state: true
-        }).distinct('_id');
+        }).populate('sender', 'img name')
+            .populate('receiver', 'img name')
+            .populate({
+                path: 'messages'
+            });
 
         if (!chats) {
             return res.json({

@@ -17,9 +17,6 @@ router.get('/:id', [
 
 router.patch('/', [
     validateJWT,
-    check('id', 'The id is invalid').isMongoId(),
-    check('id').custom(userExists),
-    validateFields
 ] ,updateUser);
 
 router.delete('/', [

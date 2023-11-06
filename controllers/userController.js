@@ -52,7 +52,7 @@ const getUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
 
-    const { name, password } = req.body;
+    const { name, password, new_password } = req.body;
     const { _id } = req.user;
 
     let image;
@@ -66,6 +66,13 @@ const updateUser = async (req, res) => {
         return res.status(400).json({
             ok: false,
             msg: 'Nothing to update'
+        })
+    }
+
+    if (password && !await bcrypt.compare(password, req.user.password)) {
+        return res.status(400).json({
+            ok: false,
+            msg: 'Incorrect last-password couldn\'t update password'
         })
     }
 
@@ -97,7 +104,7 @@ const updateUser = async (req, res) => {
         }
 
         user.name = name ?? user.name;
-        user.password = password ? await bcrypt.hash(password, salt) : user.password;
+        user.password = new_password ? await bcrypt.hash(new_password, salt) : user.password;
 
         await user.save();
 

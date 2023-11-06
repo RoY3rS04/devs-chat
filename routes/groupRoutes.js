@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createGroup, deleteGroup, getGroups, joinToGroup, leaveGroup, updateGroup } from "../controllers/groupController.js";
+import { createGroup, deleteGroup, getAuthGroups, getGroups, joinToGroup, leaveGroup, updateGroup } from "../controllers/groupController.js";
 import validateJWT from "../middlewares/validateJWT.js";
 import { check } from "express-validator";
 import validateFields from "../middlewares/validateFields.js";
@@ -7,9 +7,11 @@ import { groupExists } from "../helpers/dbValidators.js";
 
 const router = Router();
 
-router.get('/', [
+router.get('/', getGroups);
+
+router.get('/auth', [
     validateJWT
-] ,getGroups);
+], getAuthGroups);  
 
 router.post('/', [
     validateJWT,
