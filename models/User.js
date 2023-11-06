@@ -43,6 +43,12 @@ UserSchema.pre('save', async function(next) {
     this.password = await bcrypt.hash(this.password, salt);
 })
 
+UserSchema.methods.toJSON = function () {
+    const { __v, password, messages, ...user } = this.toObject();
+
+    return user;
+}
+
 const User = mongoose.model('User', UserSchema);
 
 export default User;

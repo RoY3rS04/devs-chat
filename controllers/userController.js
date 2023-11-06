@@ -138,5 +138,5 @@ export {
     getUsers,
     getUser,
     updateUser,
-    deleteUser
+    deleteUser,
 }

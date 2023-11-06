@@ -18,13 +18,15 @@ router.get('/:id', [
 router.patch('/', [
     validateJWT,
     check('id', 'The id is invalid').isMongoId(),
-    check('id').custom(userExists)
+    check('id').custom(userExists),
+    validateFields
 ] ,updateUser);
 
 router.delete('/', [
     validateJWT,
     check('id', 'The id is invalid').isMongoId(),
-    check('id').custom(userExists)
-] ,deleteUser);
+    check('id').custom(userExists),
+    validateFields
+], deleteUser);
 
 export default router;

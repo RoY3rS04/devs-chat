@@ -117,13 +117,17 @@ const logOut = (req, res) => {
     })
 }
 
-const verifySession = (req, res) => {
+const verifySession = async (req, res) => {
 
     const { passport } = req.session;
 
     if (passport && passport.user) {
+
+        const user = await User.findOne({ email: passport.user._json.email });
+
         return res.json({
             ok: true,
+            token: generateJWT(user._id),
             msg: 'Session verified correctly'
         })
     }
@@ -135,10 +139,19 @@ const verifySession = (req, res) => {
 
 }
 
+const getAuth = (req, res) => {
+
+    const {user} = req;
+
+    return res.json(user);
+
+}
+
 export {
     registerUser,
     loginUser,
     googleSuccess,
     logOut,
-    verifySession
+    verifySession,
+    getAuth
 }
