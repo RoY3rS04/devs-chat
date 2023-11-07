@@ -7,7 +7,9 @@ import { groupExists } from "../helpers/dbValidators.js";
 
 const router = Router();
 
-router.get('/', getGroups);
+router.get('/', [
+    validateJWT
+] ,getGroups);
 
 router.get('/auth', [
     validateJWT

@@ -25,15 +25,19 @@ const getAuthGroups = async (req, res) => {
 
 }
 
-const   getGroups = async (req, res) => {
+const getGroups = async (req, res) => {
 
     const { from = 0, limit = 10 } = req.query;
+    const { _id } = req.user;
 
     try {
         const [groups, total] = await Promise.all(
             [
                 Group.find({
-                    state: true
+                    state: true,
+                    users: {
+                        "$ne": _id
+                    }
                 }).skip(Number(from))
                 .limit(Number(limit)),
                 Group.countDocuments({ state: true })
@@ -58,8 +62,34 @@ const createGroup = async (req, res) => {
     const { _id } = req.user;
     const { name } = req.body;
 
+    let tempFilePath;
+
+    if (req.files) {
+        tempFilePath = req.files.image.tempFilePath;
+    }
+
+    let imageUrl;
+
+    if (!name) {
+        return res.status(400).json({
+            ok: false,
+            msg: 'Please provide a name to create the group'
+        })
+    }
+
+    if (tempFilePath) {
+        const file = await fs.readFile(tempFilePath);
+
+        const { url, fileId } = await imageKit().upload({
+            file,
+            fileName: 'group_image'
+        })
+
+        imageUrl = `${url}*${fileId}`;
+    }
+
     try {
-        const group = await Group.create({ name, users: [_id] });
+        const group = await Group.create({ name, users: [_id], img: imageUrl});
 
         res.json({
             ok: true,
@@ -157,6 +187,10 @@ const leaveGroup = async (req, res) => {
         }
 
         group.users = group.users.filter(user => String(user) !== String(_id));
+
+        if (group.users.length === 0) {
+            group.state = false;
+        }
 
         await group.save();
 

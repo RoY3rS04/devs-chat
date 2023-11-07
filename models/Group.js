@@ -23,7 +23,8 @@ const GroupSchema = mongoose.Schema({
         default: true
     },
     img: {
-        type: String
+        type: String,
+        default: 'https://ik.imagekit.io/4ztt7kzzm/default_group_image.png?updatedAt=1699391215031'
     }
 })
 

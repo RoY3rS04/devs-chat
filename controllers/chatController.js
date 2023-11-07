@@ -35,6 +35,7 @@ const getChats = async (req, res) => {
         })
 
     } catch (error) {
+        console.log(error);
         res.json({
             ok: false,
             error
@@ -73,14 +74,44 @@ const createChat = async (req, res) => {
             })
         }
 
-        const chat = await Chat.create({ sender: _id, receiver: user.id });
+        const chat = await Chat.findOne({
+            $or: [
+                {
+                    'sender': _id
+                },
+                {
+                    'receiver': _id
+                }
+            ],
+            $and: [
+                {
+                    $or: [
+                        {
+                            'sender': receiver
+                        },
+                        {
+                            'receiver': receiver
+                        }
+                    ]
+                }
+            ],
+            state: true
+        })
+
+        if (chat) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'You already have a chat with that person'
+            })
+        }
+
+        const new_Chat = await Chat.create({ sender: _id, receiver: user.id });
 
         res.json({
             ok: true,
-            chat
+            new_Chat
         })
     } catch (error) {
-        console.log(error);
         res.json({
             ok: false,
             error
