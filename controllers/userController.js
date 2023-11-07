@@ -62,7 +62,7 @@ const updateUser = async (req, res) => {
         tempFilePath = req.files.image.tempFilePath;
     }
 
-    if (!name && !tempFilePath && !password) {
+    if (!name && !tempFilePath && !new_password) {
         return res.status(400).json({
             ok: false,
             msg: 'Nothing to update'
@@ -90,7 +90,6 @@ const updateUser = async (req, res) => {
     try {
 
         const user = await User.findById(_id);
-        const salt = await bcrypt.genSalt(10);
 
         if (user.img.split('*').length > 1 && image) {
             const [, id] = user.img.split('*');
@@ -103,14 +102,14 @@ const updateUser = async (req, res) => {
             user.img = image;
         }
 
-        user.name = name ?? user.name;
-        user.password = new_password ? await bcrypt.hash(new_password, salt) : user.password;
+        user.name = name.trim() || user.name;
+        user.password = new_password.trim() || user.password;
 
         await user.save();
 
         return res.json({
             ok: true,
-            user
+            user,
         });
     } catch (error) {
         res.json({

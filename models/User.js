@@ -46,7 +46,10 @@ UserSchema.pre('save', async function(next) {
 UserSchema.methods.toJSON = function () {
     const { __v, password, messages, ...user } = this.toObject();
 
-    return user;
+    return {
+        ...user, 
+        hasPassword: !bcrypt.compareSync(':P', password)
+    };
 }
 
 const User = mongoose.model('User', UserSchema);
