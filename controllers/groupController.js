@@ -1,6 +1,7 @@
 import imageKit from "../helpers/imageKit.js";
 import Group from "../models/Group.js";
 import fs from 'node:fs/promises';
+import User from "../models/User.js";
 
 const getAuthGroups = async (req, res) => {
 
@@ -89,7 +90,12 @@ const createGroup = async (req, res) => {
     }
 
     try {
-        const group = await Group.create({ name, users: [_id], img: imageUrl});
+        const group = await Group.create({ name, users: [_id], img: imageUrl });
+        const user = await User.findById(_id);
+
+        user.groups.push(group._id);
+
+        await user.save();
 
         res.json({
             ok: true,
@@ -154,7 +160,11 @@ const joinToGroup = async (req, res) => {
 
         group.users.push(_id);
 
+        const user = await User.findById(_id);
+        user.groups.push(group._id);
+
         await group.save();
+        await user.save();
 
         res.json({
             ok: true,
@@ -178,6 +188,7 @@ const leaveGroup = async (req, res) => {
     try {
 
         const group = await Group.findById(groupId);
+        const user = await User.findById(_id);
 
         if (!group.users.includes(_id)) {
             return res.status(400).json({
@@ -192,6 +203,9 @@ const leaveGroup = async (req, res) => {
             group.state = false;
         }
 
+        user.groups.filter(g => String(g) !== String(group._id));
+
+        await user.save();
         await group.save();
 
         res.json({

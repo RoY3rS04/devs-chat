@@ -106,6 +106,9 @@ const createChat = async (req, res) => {
         }
 
         const new_Chat = await Chat.create({ sender: _id, receiver: user.id });
+        user.chats.push(new_Chat._id);
+
+        await user.save();
 
         res.json({
             ok: true,

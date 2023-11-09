@@ -1,6 +1,7 @@
 import Chat from "../models/Chat.js";
 import Message from "../models/Message.js";
 import Group from '../models/Group.js'
+import User from "../models/User.js";
 
 const getMessages = async (req, res) => {
 
@@ -109,7 +110,7 @@ const createChatMessage = async (req, res) => {
 
         res.json({
             ok: true,
-            message
+            message: await message.populate('user')
         })
     } catch (error) {
         res.status(500).json({
@@ -124,8 +125,6 @@ const createGroupMessage = async (req, res) => {
     const { _id } = req.user;
     const { id: groupId } = req.params;
     const { content } = req.body;
-    
-    const io = req.app.get('io');
 
     try {
         const group = await Group.findById(groupId);
@@ -143,11 +142,11 @@ const createGroupMessage = async (req, res) => {
 
         await group.save();
 
-        io.emit('new-message', await message.populate('user'));
+        const newMessage = await message.populate('user');
 
         res.json({
             ok: true,
-            message
+            message: newMessage
         })
     } catch (error) {
         res.status(500).json({

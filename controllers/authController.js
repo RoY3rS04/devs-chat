@@ -28,7 +28,10 @@ const registerUser = async (req, res) => {
         const user = await User.create({
             name,
             email,
-            password
+            password,
+            groups: [
+                '654bb4e174e4c8639b09406a'
+            ]
         })
 
         res.json({
@@ -85,7 +88,10 @@ const googleSuccess = async (req, res) => {
                 name,
                 email,
                 img,
-                password: ':P'
+                password: ':P',
+                groups: [
+                    '654bb4e174e4c8639b09406a'
+                ]
             })
 
             await user.save();

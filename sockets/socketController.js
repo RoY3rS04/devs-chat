@@ -1,5 +1,6 @@
 import { Socket } from 'socket.io';
 import comprobateJWT from '../helpers/comprobateJWT.js';
+import { createChatMessage, createGroupMessage } from './messageSockets.js';
 
 export default async function socketController(socket = new Socket(), io) {
 
@@ -7,16 +8,10 @@ export default async function socketController(socket = new Socket(), io) {
 
     const user = await comprobateJWT(token);
 
-    /* if (!user) {
-        socket.disconnect();
-    } */
+    if (!user) {
+        return socket.disconnect();
+    }
 
-    socket.on('connect', () => {
-        console.log('connected finally')
-    })
-
-    socket.on('hello', (data) => {
-        console.log(data);
-    })
-
+    socket.on('/messages/group', (payload) => createGroupMessage(socket, payload, io));
+    socket.on('/messages/chat', (payload) => createChatMessage(socket, payload, io));
 }

@@ -1,5 +1,7 @@
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
+import Message from "./Message.js";
+import Chat from "./Chat.js";
 
 const UserSchema = mongoose.Schema({
     name: {
@@ -30,10 +32,22 @@ const UserSchema = mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Message'
         }
+    ],
+    groups: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Group'
+        }
+    ],
+    chats: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Chat'
+        }
     ]
 })
 
-UserSchema.pre('save', async function(next) {
+UserSchema.pre('save', async function (next) {
 
     if (!this.isModified('password')) {
         next();
@@ -41,6 +55,24 @@ UserSchema.pre('save', async function(next) {
     
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
+});
+
+UserSchema.post('remove', async function () {
+
+    await Promise.all([
+        Message.updateMany({ user: this._id }, {state: false}),
+        Chat.updateMany({
+            $or: [
+                {
+                    'sender': this._id
+                },
+                {
+                    'receiver': this._id
+                }
+            ]
+        }, {state: false})
+    ])
+    
 })
 
 UserSchema.methods.toJSON = function () {
