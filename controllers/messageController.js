@@ -124,11 +124,13 @@ const createGroupMessage = async (req, res) => {
     const { _id } = req.user;
     const { id: groupId } = req.params;
     const { content } = req.body;
+    
+    const io = req.app.get('io');
 
     try {
         const group = await Group.findById(groupId);
 
-        if (!group.users.includes(_id)) {
+        if (group.name !== 'general' && !group.users.includes(_id)) {
             return res.status(400).json({
                 ok: false,
                 msg: 'You are not a member of this group'
@@ -140,6 +142,8 @@ const createGroupMessage = async (req, res) => {
         group.messages.push(message);
 
         await group.save();
+
+        io.emit('new-message', await message.populate('user'));
 
         res.json({
             ok: true,

@@ -11,10 +11,14 @@ import messageRoutes from './routes/messageRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
 import groupRoutes from './routes/groupRoutes.js';
 import cors from 'cors';
+import socketController from './sockets/socketController.js';
+import { Server } from 'socket.io';
+import { createServer } from 'node:http';
 
 dotenv.config();
 
 const app = express();
+const httpServer = createServer(app);
 
 app.use(express.json());
 
@@ -33,6 +37,18 @@ const corsOptions = {
     },
     credentials: true
 }
+
+const io = new Server(httpServer, {
+  cors: {
+    origin: "http://localhost:5173"
+  }
+});
+
+io.on('connection', (socket) => socketController(socket, io));
+
+httpServer.listen(3000);
+
+app.set('io', io);
 
 app.use(cors(corsOptions));
 
