@@ -12,6 +12,14 @@ export default async function socketController(socket = new Socket(), io) {
         return socket.disconnect();
     }
 
+    user.chats.forEach(chat => {
+        socket.join(`chats/${String(chat)}`);
+    })
+
+    user.groups.forEach(group => {
+        socket.join(`groups/${String(group)}`);
+    })
+
     socket.on('/messages/group', (payload) => createGroupMessage(socket, payload, io));
     socket.on('/messages/chat', (payload) => createChatMessage(socket, payload, io));
 }

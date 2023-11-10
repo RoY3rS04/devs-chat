@@ -57,7 +57,7 @@ UserSchema.pre('save', async function (next) {
     this.password = await bcrypt.hash(this.password, salt);
 });
 
-UserSchema.post('remove', async function () {
+UserSchema.pre('remove', async function () {
 
     await Promise.all([
         Message.updateMany({ user: this._id }, {state: false}),

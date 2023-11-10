@@ -21,8 +21,7 @@ router.patch('/', [
 
 router.delete('/', [
     validateJWT,
-    check('id', 'The id is invalid').isMongoId(),
-    check('id').custom(userExists),
+    check('password', 'Password field must be filled').not().isEmpty(),
     validateFields
 ], deleteUser);
 

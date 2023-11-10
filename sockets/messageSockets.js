@@ -35,9 +35,10 @@ const createChatMessage = async (socket = new Socket(), payload, io) => {
 
         const newMessage = await message.populate('user')
 
-        io.emit('new-message', {
+        io.to(`chats/${chatId}`).emit('new-message', {
             ok: true,
-            message: newMessage
+            message: newMessage,
+            belongsTo: chatId
         });
     } catch (error) {
         res.status(500).json({
@@ -78,9 +79,10 @@ const createGroupMessage = async (socket = new Socket(), payload, io) => {
 
         const newMessage = await message.populate('user');
 
-        io.emit('new-message', {
+        io.to(`groups/${groupId}`).emit('new-message', {
             ok: true,
-            message: newMessage
+            message: newMessage,
+            belongsTo: groupId
         });
 
     } catch (error) {

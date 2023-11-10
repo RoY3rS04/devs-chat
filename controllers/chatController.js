@@ -58,19 +58,22 @@ const createChat = async (req, res) => {
 
     try {
         
-        const user = await User.findById(receiver); 
+        const [user1, user2] = await Promise.all([
+            User.findById(receiver),
+            User.findById(_id)
+        ]); 
 
-        if (!user) {
+        if (!user1) {
             return res.json({
                 ok: false,
-                msg: 'The user doesn\'t exists'
+                msg: 'The user1 doesn\'t exists'
             })
         }
 
-        if (!user.state) {
+        if (!user1.state) {
             return res.json({
                 ok: false,
-                msg: 'The user was deleted from the app'
+                msg: 'The user1 was deleted from the app'
             })
         }
 
@@ -105,10 +108,14 @@ const createChat = async (req, res) => {
             })
         }
 
-        const new_Chat = await Chat.create({ sender: _id, receiver: user.id });
-        user.chats.push(new_Chat._id);
+        const new_Chat = await Chat.create({ sender: _id, receiver: user1.id });
+        user1.chats.push(new_Chat._id);
+        user2.chats.push(new_Chat._id);
 
-        await user.save();
+        await Promise.all([
+            user1.save(),
+            user2.save()
+        ]);
 
         res.json({
             ok: true,

@@ -123,6 +123,15 @@ const updateUser = async (req, res) => {
 const deleteUser = async (req, res) => {
 
     const { _id } = req.user;
+    const { password } = req.body;
+
+    if (!await bcrypt.compare(password, req.user.password)) {
+        
+        return res.json({
+            ok: false,
+            msg: 'Incorrect password'
+        })
+    }
 
     try {
         const user = await User.findByIdAndUpdate(_id, { state: false }, {new: true});
