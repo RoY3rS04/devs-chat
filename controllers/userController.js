@@ -134,7 +134,10 @@ const deleteUser = async (req, res) => {
     }
 
     try {
-        const user = await User.findByIdAndUpdate(_id, { state: false }, {new: true});
+        const user = await User.findById(_id);
+        user.state = false;
+
+        await user.save();
 
         res.json({
             ok: true,

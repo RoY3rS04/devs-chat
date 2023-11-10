@@ -57,22 +57,25 @@ UserSchema.pre('save', async function (next) {
     this.password = await bcrypt.hash(this.password, salt);
 });
 
-UserSchema.pre('remove', async function () {
+UserSchema.post('save', async function (user) {
+
+    if (user.state) {
+        return;
+    }
 
     await Promise.all([
-        Message.updateMany({ user: this._id }, {state: false}),
+        Message.updateMany({ user: user._id }, {state: false}),
         Chat.updateMany({
             $or: [
                 {
-                    'sender': this._id
+                    'sender': user._id
                 },
                 {
-                    'receiver': this._id
+                    'receiver': user._id
                 }
             ]
         }, {state: false})
     ])
-    
 })
 
 UserSchema.methods.toJSON = function () {

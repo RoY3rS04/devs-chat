@@ -72,6 +72,8 @@ const createGroupMessage = async (socket = new Socket(), payload, io) => {
         group.messages.push(message);
         user.messages.push(message);
 
+        console.log('before');
+
         await Promise.all([
             group.save(),
             user.save()
@@ -86,6 +88,7 @@ const createGroupMessage = async (socket = new Socket(), payload, io) => {
         });
 
     } catch (error) {
+
         socket.emit('new-message', {
             ok: false,
             msg: 'Something went wrong'
