@@ -72,8 +72,6 @@ const createGroupMessage = async (socket = new Socket(), payload, io) => {
         group.messages.push(message);
         user.messages.push(message);
 
-        console.log('before');
-
         await Promise.all([
             group.save(),
             user.save()

@@ -24,15 +24,19 @@ const getMessages = async (req, res) => {
 const getChatMessages = async (req, res) => {
 
     const { id } = req.params;
+    const { _id } = req.user;
 
     try {
         const chat = await Chat.findById(id)
             .populate({
                 path: 'messages',
+                match: {
+                    state: true
+                },
                 populate: {
                     path: 'user'
                 }
-            });
+            }).populate('receiver', '_id name img').populate('sender', '_id name img');
 
         if (!chat) {
             return res.json({
@@ -43,7 +47,13 @@ const getChatMessages = async (req, res) => {
 
         res.json({
             ok: true,
-            messages: chat.messages.filter(message => message.state)
+            chat: {
+                _id: chat._id,
+                messages: chat.messages,
+                user: [
+                    chat.sender, chat.receiver
+                ].find(user => String(user._id) !== String(_id))
+            }
         })
     } catch (error) {
         res.json({
@@ -62,6 +72,9 @@ const getGroupMessages = async (req, res) => {
         const group = await Group.findById(id)
             .populate({
                 path: 'messages',
+                match: {
+                    state: true
+                },
                 populate: {
                     path: 'user'
                 }
@@ -76,7 +89,7 @@ const getGroupMessages = async (req, res) => {
 
         res.json({
             ok: true,
-            messages: group.messages.filter(message => message.state)
+            group
         })
     } catch (error) {
         res.json({

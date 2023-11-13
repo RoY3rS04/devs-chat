@@ -95,13 +95,13 @@ const googleSuccess = async (req, res) => {
             })
 
             await user.save();
-        }
+        }/* 
 
         if (!user.state) {
             return res.json({
                 msg: 'Your account was deleted'
             })
-        }
+        } */
 
         res.redirect('http://localhost:5173/');
 

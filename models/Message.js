@@ -12,7 +12,7 @@ const MessageSchema = mongoose.Schema({
     },
     createdAt: {
         type: String,
-        default: new Date().toLocaleDateString('en-us', { weekday:"long", year:"numeric", month:"short", day:"numeric"})
+        default: Date.now()
     },
     state: {
         type: Boolean,

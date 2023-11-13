@@ -36,6 +36,9 @@ const getGroups = async (req, res) => {
             [
                 Group.find({
                     state: true,
+                    name: {
+                        $ne: 'general'
+                    },
                     users: {
                         "$ne": _id
                     }
