@@ -70,7 +70,7 @@ const googleStrategy = googlePass.Strategy;
 
 passport.use(new googleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_SECRET,
+    clientSecret: `${process.env.GOOGLE_SECRET}/auth/google/success`,
     callbackURL: process.env.BACK_URL
     },
     function(accessToken, refreshToken, profile, cb) {
