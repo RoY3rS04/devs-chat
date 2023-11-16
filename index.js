@@ -23,7 +23,7 @@ const httpServer = createServer(app);
 app.use(express.json());
 
 const permitedDomains = [
-    'http://localhost:5173',
+    process.env.FRONTEND_URL,
     'http://localhost:8080'
 ];
 
@@ -40,7 +40,7 @@ const corsOptions = {
 
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:5173"
+    origin: process.env.FRONTEND_URL
   }
 });
 
