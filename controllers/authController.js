@@ -103,7 +103,7 @@ const googleSuccess = async (req, res) => {
             })
         } */
 
-        res.redirect('http://localhost:5173/');
+        res.redirect(process.env.FRONTEND_URL);
 
     } catch (error) {
         console.log(error);
