@@ -71,7 +71,7 @@ const googleStrategy = googlePass.Strategy;
 passport.use(new googleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_SECRET,
-    callbackURL: "http://localhost:8080/auth/google/success"
+    callbackURL: "/auth/google/success"
     },
     function(accessToken, refreshToken, profile, cb) {
       cb(null, profile);
